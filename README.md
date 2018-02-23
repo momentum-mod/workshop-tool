@@ -11,6 +11,9 @@ C++14 compiler
 Qt5.6 or newer (Any version of Qt5 *should* work though)
 Steamworks SDK (see steamworks/readme.txt)
 ```
+
+Don't forget: you must put steam_appid.txt with the correct Momentum Mod appid in the same directory as the executable! 
+
 To build and run on Linux/OSX: 
 
 ```
