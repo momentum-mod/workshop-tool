@@ -1,3 +1,11 @@
+# IDES
+.vs
+
+# Ignore steamworks sdk
+steamworks/*/
+# except for readme
+!*/steamworks/readme.txt
+
 # Prerequisites
 *.d
 
@@ -15,10 +23,6 @@
 *.so
 *.dylib
 *.dll
-
-# Fortran module files
-*.mod
-*.smod
 
 # Compiled Static libraries
 *.lai
