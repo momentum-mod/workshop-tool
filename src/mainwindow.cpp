@@ -22,7 +22,7 @@ MainWindow::MainWindow(QWidget *parent)
     //create a new timer object that runs in the background
     QTimer *timer = new QTimer(this);
     connect(timer, &QTimer::timeout, 
-        SteamAPI_RunCallbacks); //run steamapi callbacks, thats it
+        SteamAPI_RunCallbacks); //run steamapi callbacks
     timer->start(10); //run at 100 hz
 }
 MainWindow::~MainWindow()
@@ -32,12 +32,20 @@ MainWindow::~MainWindow()
 void MainWindow::OnUploadButtonClicked()
 {
     m_currentItem = std::make_unique<WorkshopItem>();
+    connect(m_currentItem.get(), &WorkshopItem::WorkshopItemReady,
+        this, &MainWindow::OnItemReady);
 
     m_currentItem->SetMapName(m_lnItemTitle->text());
     m_currentItem->SetMapDescription(m_lnItemDescription->text());
     m_currentItem->SetUpdateLanguage(m_languages.GetCurrentLanguage());
 
-    m_currentItem->ReadyForUpload();
+    m_currentItem->BeginUpload();
+    m_statusBar->showMessage("Beginning upload...");
+}
+
+void MainWindow::OnItemReady()
+{
+    m_statusBar->showMessage("Workshop Item Ready!", 1000);
 }
 
 void MainWindow::SetupUI()
@@ -49,6 +57,7 @@ void MainWindow::SetupUI()
     m_btnUpload = new QPushButton(tr("Upload"));
     connect(m_btnUpload, &QPushButton::clicked, 
         this, &MainWindow::OnUploadButtonClicked);
+
     m_lnItemTitle = new QLineEdit;
     m_lnItemDescription = new QLineEdit;
 
@@ -61,5 +70,8 @@ void MainWindow::SetupUI()
     auto frame = new QFrame;
     frame->setLayout(layout);
 
+    m_statusBar = new QStatusBar;
+    setStatusBar(m_statusBar);
+    m_statusBar->showMessage("Ready.");
     setCentralWidget(frame);
 }

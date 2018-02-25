@@ -2,7 +2,7 @@
 
 #include <QMainWindow>
 #include <QPushButton>
-#include <QComboBox>
+#include <QStatusBar>
 #include <QLineEdit>
 #include <memory>
 
@@ -19,11 +19,12 @@ public:
 
  private slots:
     void OnUploadButtonClicked();
+    void OnItemReady();
 private:
     QPushButton* m_btnUpload;
     QLineEdit* m_lnItemTitle, *m_lnItemDescription;
 
-    QComboBox* m_cbLanguage;
+    QStatusBar* m_statusBar;
     Languages m_languages;
 
     std::unique_ptr<WorkshopItem> m_currentItem; //only support one item at this time

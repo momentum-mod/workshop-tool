@@ -5,10 +5,12 @@
 #include "steam/steam_api.h"
 #include "language.hpp"
 
+#include <future>
 static const int MOMENTUM_APPID = 669270;
 
 class WorkshopItem : public QObject
 {
+    Q_OBJECT
 public:
     WorkshopItem(int appID = MOMENTUM_APPID);
     void BeginUpload();
@@ -21,23 +23,25 @@ public:
     void SetMapPreviewImage(...);
     void SetContent(); //the actual map file(s)
     */
-    bool ItemExists() const { return m_nPublishedFileId != 0; }
-
+signals:
+    void WorkshopItemReady();
 private:
+    void AsyncUpload(); 
     void OnWorkshopItemCreated(CreateItemResult_t* result, bool bIOFailure);
     CCallResult<WorkshopItem, CreateItemResult_t> m_ItemCreatedCallback;
 
     void OnWorkshopItemUpdated(SubmitItemUpdateResult_t* result, bool bIOFailure);
     CCallResult<WorkshopItem, SubmitItemUpdateResult_t> m_ItemUpdateCallback;
 
-    const char* m_pszMapName;
-    const char* m_pszMapDescription;
-    const char* m_pszPreviewImageFilePath;
-    const char* m_pszContentFolder; //The absolute path to a local folder containing the content for the item.
+    QString m_sMapName;
+    QString m_sMapDescription;
+    QString m_sPreviewImageFilePath;
+    QString m_sContentFolder; //The absolute path to a local folder containing the content for the item.
     const char* m_pszLangugage;
 
     UGCUpdateHandle_t m_handle;
-    PublishedFileId_t m_nPublishedFileId;
+    std::promise<PublishedFileId_t> m_nPublishedFileId;
+
     int m_nAppId;
 };
 

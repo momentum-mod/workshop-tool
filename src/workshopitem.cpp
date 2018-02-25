@@ -1,10 +1,12 @@
 #include <QMessageBox>
 #include <QtDebug>
 
+#include <thread>
+
 #include "workshopitem.hpp"
 
 WorkshopItem::WorkshopItem(int appID)
-    : m_nPublishedFileId(0), m_nAppId(appID)
+    : m_nAppId(appID)
 {
     const auto call = SteamUGC()->CreateItem(appID, k_EWorkshopFileTypeCommunity);
     m_ItemCreatedCallback.Set(call, this, &WorkshopItem::OnWorkshopItemCreated);
@@ -12,28 +14,39 @@ WorkshopItem::WorkshopItem(int appID)
 
 void WorkshopItem::BeginUpload()
 {
-    m_handle = SteamUGC()->StartItemUpdate(m_nAppId, m_nPublishedFileId);
-    SteamUGC()->SetItemTitle(m_handle, m_pszMapName);
-    SteamUGC()->SetItemDescription(m_handle, m_pszMapDescription);
-    SteamUGC()->SetItemUpdateLanguage(m_handle, m_pszLangugage);
-
-    const auto call = SteamUGC()->SubmitItemUpdate(m_handle, "");
-    m_ItemUpdateCallback.Set(call, this, &WorkshopItem::OnWorkshopItemUpdated);
+    //spawn a new thread so that our upload process does not block the CCallResult
+    std::thread upload(&WorkshopItem::AsyncUpload, this); 
+    upload.detach();
 }
 
 void WorkshopItem::SetMapName(const QString& name)
 {
-    m_pszMapName = name.toUtf8().constData();
+    m_sMapName = name;
 }
 
 void WorkshopItem::SetMapDescription(const QString& text)
 {
-    m_pszMapDescription = text.toUtf8().constData();
+    m_sMapDescription = text;
 }
 
 void WorkshopItem::SetUpdateLanguage(Language lang)
 {
     m_pszLangugage = lang.first;
+}
+
+void WorkshopItem::AsyncUpload()
+{
+    const auto id = m_nPublishedFileId.get_future().get(); //block execution and wait for OnWorkshopItemCreated.
+    //this is fine since AsyncUpload() is run in a seperate thread
+
+    m_handle = SteamUGC()->StartItemUpdate(m_nAppId, id);
+    SteamUGC()->SetItemTitle(m_handle, m_sMapName.toUtf8().constData());
+    SteamUGC()->SetItemDescription(m_handle, m_sMapDescription.toUtf8().constData());
+    SteamUGC()->SetItemUpdateLanguage(m_handle, m_pszLangugage);
+
+    const auto call = SteamUGC()->SubmitItemUpdate(m_handle, "");
+    m_ItemUpdateCallback.Set(call, this, &WorkshopItem::OnWorkshopItemUpdated);
+    //thread joins
 }
 
 //callback for when SteamUGC()->CreateItem is called
@@ -47,7 +60,8 @@ void WorkshopItem::OnWorkshopItemCreated(CreateItemResult_t* result, bool bIOFai
             "SteamUGC::CreateItem failed. Error: " + result->m_eResult);
         return;
     }
-    m_nPublishedFileId = result->m_nPublishedFileId; //store published file ID for later editing
+    m_nPublishedFileId.set_value(result->m_nPublishedFileId); //store published file ID for later editing
+    emit WorkshopItemReady();
 }
 
 void WorkshopItem::OnWorkshopItemUpdated(SubmitItemUpdateResult_t* result, bool bIOFailure)
