@@ -1,24 +1,39 @@
 #include <QMessageBox>
+#include <QtDebug>
 
 #include "workshopitem.hpp"
 
 WorkshopItem::WorkshopItem(int appID)
     : m_nPublishedFileId(0), m_nAppId(appID)
 {
-    SteamUGC()->CreateItem(appID, k_EWorkshopFileTypeCommunity);
+    const auto call = SteamUGC()->CreateItem(appID, k_EWorkshopFileTypeCommunity);
+    m_ItemCreatedCallback.Set(call, this, &WorkshopItem::OnWorkshopItemCreated);
 }
 
 void WorkshopItem::BeginUpload()
 {
     m_handle = SteamUGC()->StartItemUpdate(m_nAppId, m_nPublishedFileId);
-    SteamUGC()->SetItemTitle(m_handle, m_sMapName.toUtf8().constData());
-    //... 
-    SteamUGC()->SubmitItemUpdate(m_handle, "");
+    SteamUGC()->SetItemTitle(m_handle, m_pszMapName);
+    SteamUGC()->SetItemDescription(m_handle, m_pszMapDescription);
+    SteamUGC()->SetItemUpdateLanguage(m_handle, m_pszLangugage);
+
+    const auto call = SteamUGC()->SubmitItemUpdate(m_handle, "");
+    m_ItemUpdateCallback.Set(call, this, &WorkshopItem::OnWorkshopItemUpdated);
 }
 
 void WorkshopItem::SetMapName(const QString& name)
 {
-    m_sMapName = name;
+    m_pszMapName = name.toUtf8().constData();
+}
+
+void WorkshopItem::SetMapDescription(const QString& text)
+{
+    m_pszMapDescription = text.toUtf8().constData();
+}
+
+void WorkshopItem::SetUpdateLanguage(Language lang)
+{
+    m_pszLangugage = lang.first;
 }
 
 //callback for when SteamUGC()->CreateItem is called

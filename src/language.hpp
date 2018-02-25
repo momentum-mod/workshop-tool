@@ -14,7 +14,8 @@ public:
     Languages()
         : m_cbLanguages(new QComboBox)
     {
-        this->m_cbLanguages->insertItems(0, GetAllLanguages());
+        m_cbLanguages->insertItems(0, GetAllLanguages());
+        m_cbLanguages->setCurrentIndex(7); //default to english :^)
     }
     std::vector<Language> m_languages
     {
@@ -57,19 +58,15 @@ public:
         }
         return list;
     }
-    const char* GetLanguageAPICode(int index)
+    Language GetCurrentLanguage()
     {
-        return m_languages[index].first;
-    }
-    QString GetLanguageNativeName(int index)
-    {
-        return m_languages[index].second;
+        return m_languages[m_cbLanguages->currentIndex()];
     }
     QComboBox* Languages::GetLanguageComboBox() const
     {
         return m_cbLanguages;
     }
 private:
-    QComboBox * m_cbLanguages = nullptr;
+    QComboBox * m_cbLanguages;
 };
 

@@ -4,8 +4,10 @@
 #include <QPushButton>
 #include <QComboBox>
 #include <QLineEdit>
+#include <memory>
 
 #include "language.hpp"
+#include "workshopitem.hpp"
 
 class MainWindow : public QMainWindow
 {
@@ -16,7 +18,6 @@ public:
     ~MainWindow();
 
  private slots:
-
     void OnUploadButtonClicked();
 private:
     QPushButton* m_btnUpload;
@@ -24,6 +25,8 @@ private:
 
     QComboBox* m_cbLanguage;
     Languages m_languages;
+
+    std::unique_ptr<WorkshopItem> m_currentItem; //only support one item at this time
 
     void SetupUI();
 };

@@ -1,11 +1,12 @@
 #include <QLabel>
 #include <QMessageBox>
 #include <QFormLayout>
+#include <QTimer>
+#include <QtDebug>
 
 #include "steam/steam_api.h"
 
 #include "mainwindow.hpp"
-#include "workshopitem.hpp"
 
 
 MainWindow::MainWindow(QWidget *parent)
@@ -18,17 +19,25 @@ MainWindow::MainWindow(QWidget *parent)
         fatalError.critical(nullptr, "ERROR!", "Could not init Steam API");
         exit(-1);
     }
+    //create a new timer object that runs in the background
+    QTimer *timer = new QTimer(this);
+    connect(timer, &QTimer::timeout, 
+        SteamAPI_RunCallbacks); //run steamapi callbacks, thats it
+    timer->start(10); //run at 100 hz
 }
 MainWindow::~MainWindow()
 {
 
 }
-
 void MainWindow::OnUploadButtonClicked()
 {
-    auto item = new WorkshopItem; // yes i knwo theres a memory leak
-    item->SetMapName(m_lnItemTitle->text());
-    item->BeginUpload();
+    m_currentItem = std::make_unique<WorkshopItem>();
+
+    m_currentItem->SetMapName(m_lnItemTitle->text());
+    m_currentItem->SetMapDescription(m_lnItemDescription->text());
+    m_currentItem->SetUpdateLanguage(m_languages.GetCurrentLanguage());
+
+    m_currentItem->ReadyForUpload();
 }
 
 void MainWindow::SetupUI()
