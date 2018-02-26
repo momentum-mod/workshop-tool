@@ -18,13 +18,14 @@ public:
     void SetMapName(const QString& name);
     void SetMapDescription(const QString& text);
     void SetUpdateLanguage(Language lang);
+    void SetContent(const QString& path); //the actual map file(s)
 
     /*
     void SetMapPreviewImage(...);
-    void SetContent(); //the actual map file(s)
     */
 signals:
     void WorkshopItemReady();
+    void ItemUploadComplete();
 private:
     void AsyncUpload(); 
     void OnWorkshopItemCreated(CreateItemResult_t* result, bool bIOFailure);

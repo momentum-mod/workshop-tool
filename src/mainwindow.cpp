@@ -2,12 +2,12 @@
 #include <QMessageBox>
 #include <QFormLayout>
 #include <QTimer>
+#include <QFileDialog>
 #include <QtDebug>
 
 #include "steam/steam_api.h"
 
 #include "mainwindow.hpp"
-
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -25,10 +25,6 @@ MainWindow::MainWindow(QWidget *parent)
         SteamAPI_RunCallbacks); //run steamapi callbacks
     timer->start(10); //run at 100 hz
 }
-MainWindow::~MainWindow()
-{
-
-}
 void MainWindow::OnUploadButtonClicked()
 {
     m_currentItem = std::make_unique<WorkshopItem>();
@@ -38,6 +34,7 @@ void MainWindow::OnUploadButtonClicked()
     m_currentItem->SetMapName(m_lnItemTitle->text());
     m_currentItem->SetMapDescription(m_lnItemDescription->text());
     m_currentItem->SetUpdateLanguage(m_languages.GetCurrentLanguage());
+    m_currentItem->SetContent(m_Selector->GetAbsolutePathToContent());
 
     m_currentItem->BeginUpload();
     m_statusBar->showMessage("Beginning upload...");
@@ -60,10 +57,11 @@ void MainWindow::SetupUI()
 
     m_lnItemTitle = new QLineEdit;
     m_lnItemDescription = new QLineEdit;
-
+    m_Selector = new FileSelector;
     layout->addRow("Map Title", m_lnItemTitle);
     layout->addRow("Map Description", m_lnItemDescription);
     layout->addRow("Language", m_languages.GetLanguageComboBox());
+    layout->addWidget(m_Selector);
 
     layout->addWidget(m_btnUpload);
 

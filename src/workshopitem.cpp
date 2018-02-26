@@ -34,6 +34,11 @@ void WorkshopItem::SetUpdateLanguage(Language lang)
     m_pszLangugage = lang.first;
 }
 
+void WorkshopItem::SetContent(const QString& path)
+{
+    m_sContentFolder = path;
+}
+
 void WorkshopItem::AsyncUpload()
 {
     const auto id = m_nPublishedFileId.get_future().get(); //block execution and wait for OnWorkshopItemCreated.
@@ -43,6 +48,7 @@ void WorkshopItem::AsyncUpload()
     SteamUGC()->SetItemTitle(m_handle, m_sMapName.toUtf8().constData());
     SteamUGC()->SetItemDescription(m_handle, m_sMapDescription.toUtf8().constData());
     SteamUGC()->SetItemUpdateLanguage(m_handle, m_pszLangugage);
+    SteamUGC()->SetItemContent(m_handle, m_sContentFolder.toUtf8().constData());
 
     const auto call = SteamUGC()->SubmitItemUpdate(m_handle, "");
     m_ItemUpdateCallback.Set(call, this, &WorkshopItem::OnWorkshopItemUpdated);

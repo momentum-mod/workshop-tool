@@ -39,7 +39,8 @@ set (PROJECT_SRCS
 		src/main.cpp
         src/mainwindow.hpp src/mainwindow.cpp
         src/workshopitem.hpp src/workshopitem.cpp
-        src/language.hpp)
+        src/language.hpp
+        src/fileselector.hpp src/fileselector.cpp)
 
 add_executable(momentum-workshop-tool ${GUI_TYPE} ${PROJECT_SRCS})
 
