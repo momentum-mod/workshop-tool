@@ -25,9 +25,17 @@ public:
     */
 signals:
     void WorkshopItemReady();
-    void ItemUploadComplete();
+    void ItemUploadBegan();
+    void ItemUploadStatus(uint64 pBytesProcessed, uint64 pBytesTotal);
+    void ItemUploadCompleted();
+
+    private slots:
+    void UpdateUploadProgress();
+    void OnUploadBegan();
+
 private:
-    void AsyncUpload(); 
+    void AsyncUpload();
+
     void OnWorkshopItemCreated(CreateItemResult_t* result, bool bIOFailure);
     CCallResult<WorkshopItem, CreateItemResult_t> m_ItemCreatedCallback;
 
@@ -44,5 +52,7 @@ private:
     std::promise<PublishedFileId_t> m_nPublishedFileId;
 
     int m_nAppId;
+    uint64 m_BytesProcessed, m_BytesTotal;
+    QTimer* m_uploadProcess;
 };
 

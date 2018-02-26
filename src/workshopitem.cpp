@@ -1,5 +1,6 @@
 #include <QMessageBox>
 #include <QtDebug>
+#include <QTimer>
 
 #include <thread>
 
@@ -10,6 +11,9 @@ WorkshopItem::WorkshopItem(int appID)
 {
     const auto call = SteamUGC()->CreateItem(appID, k_EWorkshopFileTypeCommunity);
     m_ItemCreatedCallback.Set(call, this, &WorkshopItem::OnWorkshopItemCreated);
+
+    connect(this, &WorkshopItem::ItemUploadBegan,
+        this, &WorkshopItem::OnUploadBegan);
 }
 
 void WorkshopItem::BeginUpload()
@@ -39,6 +43,12 @@ void WorkshopItem::SetContent(const QString& path)
     m_sContentFolder = path;
 }
 
+void WorkshopItem::UpdateUploadProgress()
+{    
+    SteamUGC()->GetItemUpdateProgress(m_handle, &m_BytesProcessed, &m_BytesTotal);
+    emit ItemUploadStatus(m_BytesProcessed, m_BytesTotal);
+}
+
 void WorkshopItem::AsyncUpload()
 {
     const auto id = m_nPublishedFileId.get_future().get(); //block execution and wait for OnWorkshopItemCreated.
@@ -52,7 +62,18 @@ void WorkshopItem::AsyncUpload()
 
     const auto call = SteamUGC()->SubmitItemUpdate(m_handle, "");
     m_ItemUpdateCallback.Set(call, this, &WorkshopItem::OnWorkshopItemUpdated);
-    //thread joins
+    emit ItemUploadBegan();
+
+    //thread exits
+}
+
+void WorkshopItem::OnUploadBegan()
+{
+    //create a timer that signals the upload process to any interested parties (i.e mainwindow)
+    m_uploadProcess = new QTimer(this);
+    connect(m_uploadProcess, &QTimer::timeout,
+        this, &WorkshopItem::UpdateUploadProgress);
+    m_uploadProcess->start(20); //run at 50 hz
 }
 
 //callback for when SteamUGC()->CreateItem is called
@@ -72,6 +93,8 @@ void WorkshopItem::OnWorkshopItemCreated(CreateItemResult_t* result, bool bIOFai
 
 void WorkshopItem::OnWorkshopItemUpdated(SubmitItemUpdateResult_t* result, bool bIOFailure)
 {
+    m_uploadProcess->stop();
+
     if (result->m_eResult != k_EResultOK)
     {
         QMessageBox fatalError;
@@ -80,4 +103,5 @@ void WorkshopItem::OnWorkshopItemUpdated(SubmitItemUpdateResult_t* result, bool 
             "SteamUGC::SubmitItemUpdate failed. Error: " + result->m_eResult);
         return;
     }
+    emit ItemUploadCompleted();
 }

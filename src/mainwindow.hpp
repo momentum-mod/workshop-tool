@@ -4,6 +4,8 @@
 #include <QPushButton>
 #include <QStatusBar>
 #include <QLineEdit>
+#include <QProgressBar>
+
 #include <memory>
 
 #include "language.hpp"
@@ -20,11 +22,17 @@ public:
 
  private slots:
     void OnUploadButtonClicked();
+    void OnAddFilesButtonClicked();
+
     void OnItemReady();
+    void OnItemUploadBegan();
+    void OnItemStatusUpdate(uint64 pBytesProcessed, uint64 pBytesTotal);
+    void OnItemUploadCompleted();
 private:
-    QPushButton* m_btnUpload;
+    QPushButton* m_btnUpload, *m_btnAddFiles;
     QLineEdit* m_lnItemTitle, *m_lnItemDescription;
     QStatusBar* m_statusBar;
+    QProgressBar* m_progressBar;
     Languages m_languages;
 
     FileSelector* m_Selector;
