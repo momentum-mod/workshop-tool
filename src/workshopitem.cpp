@@ -37,12 +37,17 @@ void WorkshopItem::SetMapDescription(const QString& text)
 
 void WorkshopItem::SetUpdateLanguage(Language lang)
 {
-    m_pszLangugage = lang.first;
+    m_sLangugage = lang.first;
 }
 
 void WorkshopItem::SetContent(const QString& path)
 {
     m_sContentFolder = path;
+}
+
+void WorkshopItem::SetPreviewImage(const QString& path)
+{
+    m_sPreviewImageFilePath = path;
 }
 
 void WorkshopItem::UpdateUploadProgress()
@@ -59,8 +64,9 @@ void WorkshopItem::AsyncUpload()
     m_handle = SteamUGC()->StartItemUpdate(m_nAppId, m_nPublishedFileId);
     SteamUGC()->SetItemTitle(m_handle, m_sMapName.toUtf8().constData());
     SteamUGC()->SetItemDescription(m_handle, m_sMapDescription.toUtf8().constData());
-    SteamUGC()->SetItemUpdateLanguage(m_handle, m_pszLangugage);
+    SteamUGC()->SetItemUpdateLanguage(m_handle, m_sLangugage.toUtf8().constData());
     SteamUGC()->SetItemContent(m_handle, m_sContentFolder.toUtf8().constData());
+    SteamUGC()->SetItemPreview(m_handle, m_sPreviewImageFilePath.toUtf8().constData());
 
     const auto call = SteamUGC()->SubmitItemUpdate(m_handle, "");
     m_ItemUpdateCallback.Set(call, this, &WorkshopItem::OnWorkshopItemUpdated);

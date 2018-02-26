@@ -19,7 +19,7 @@ public:
     void SetMapDescription(const QString& text);
     void SetUpdateLanguage(Language lang);
     void SetContent(const QString& path); //the actual map file(s)
-
+    void SetPreviewImage(const QString& path);
     /*
     void SetMapPreviewImage(...);
     */
@@ -46,7 +46,7 @@ private:
     QString m_sMapDescription;
     QString m_sPreviewImageFilePath;
     QString m_sContentFolder; //The absolute path to a local folder containing the content for the item.
-    const char* m_pszLangugage;
+    QString m_sLangugage;
 
     UGCUpdateHandle_t m_handle;
     std::promise<PublishedFileId_t> m_promiseForFileID;

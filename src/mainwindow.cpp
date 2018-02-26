@@ -28,7 +28,7 @@ MainWindow::MainWindow(QWidget *parent)
 void MainWindow::SetupUI()
 {
     setWindowTitle(tr("Momentum Mod - Workshop Upload Tool"));
-    setGeometry(100, 100, 400, 400);
+    setGeometry(100, 100, 0, 0);
 
     m_statusBar = new QStatusBar;
     m_progressBar = new QProgressBar;
@@ -39,20 +39,24 @@ void MainWindow::SetupUI()
     auto layout = new QFormLayout;
     m_btnUpload = new QPushButton(tr("Upload"));
     m_btnAddFiles = new QPushButton(tr("Add files"));
+    m_btnSelectImage = new QPushButton(tr("Select Preview Image"));
 
     connect(m_btnUpload, &QPushButton::clicked,
         this, &MainWindow::OnUploadButtonClicked);
     connect(m_btnAddFiles, &QPushButton::clicked,
         this, &MainWindow::OnAddFilesButtonClicked);
+    connect(m_btnSelectImage, &QPushButton::clicked,
+        this, &MainWindow::OnPreviewImageButtonClicked);
 
     m_lnItemTitle = new QLineEdit;
     m_lnItemDescription = new QLineEdit;
-    m_Selector = new FileSelector;
+    m_FileSelector = new FileSelector;
+    m_ImageSelector = new ImageSelector;
     layout->addRow(tr("Map Title"), m_lnItemTitle);
     layout->addRow(tr("Map Description"), m_lnItemDescription);
     layout->addRow(tr("Language"), m_languages.GetLanguageComboBox());
-    layout->addRow(m_btnAddFiles, m_Selector);
-
+    layout->addRow(m_btnAddFiles, m_FileSelector);
+    layout->addRow(m_btnSelectImage, m_ImageSelector);
     layout->addWidget(m_btnUpload);
 
     auto terms = new QLabel;
@@ -85,9 +89,14 @@ void MainWindow::OnUploadButtonClicked()
     m_currentItem->SetMapName(m_lnItemTitle->text());
     m_currentItem->SetMapDescription(m_lnItemDescription->text());
     m_currentItem->SetUpdateLanguage(m_languages.GetCurrentLanguage());
-    m_currentItem->SetContent(m_Selector->GetAbsolutePathToContent());
+    m_currentItem->SetContent(m_FileSelector->GetAbsolutePathToContent());
+    m_currentItem->SetPreviewImage(m_ImageSelector->GetImageAbsolutePath());
 
     //disable the UI elements so the user can't mess with stuff while we're uploading
+    m_lnItemTitle->setEnabled(false);
+    m_lnItemDescription->setEnabled(false);
+    m_languages.GetLanguageComboBox()->setEnabled(false);
+    m_FileSelector->setEnabled(false);
 
     m_currentItem->BeginUpload();
 }
@@ -104,7 +113,25 @@ void MainWindow::OnAddFilesButtonClicked()
     }
     for (const auto& file : fileNames)
     {
-        m_Selector->AddFile(file);
+        m_FileSelector->AddFile(file);
+    }
+}
+
+void MainWindow::OnPreviewImageButtonClicked()
+{
+    QFileDialog dialog(this);
+    dialog.setFileMode(QFileDialog::AnyFile);
+    dialog.setViewMode(QFileDialog::Detail);
+    dialog.setNameFilter(tr("Images (*.png *.gif *.jpg *.jpeg)"));
+
+    QStringList fileNames;
+    if (dialog.exec())
+    {
+        fileNames = dialog.selectedFiles();
+    }
+    for (const auto& file : fileNames)
+    {
+        m_ImageSelector->OpenImage(file);
     }
 }
 
@@ -118,10 +145,10 @@ void MainWindow::OnItemUploadBegan()
     m_statusBar->showMessage(tr("Upload began!"));
 }
 
-void MainWindow::OnItemStatusUpdate(uint64 pBytesProcessed, uint64 pBytesTotal)
+void MainWindow::OnItemStatusUpdate(uint64 bytesProcessed, uint64 bytesTotal)
 {
-    m_progressBar->setRange(0, pBytesTotal);
-    m_progressBar->setValue(pBytesProcessed);
+    m_progressBar->setRange(0, bytesTotal);
+    m_progressBar->setValue(bytesProcessed);
 }
 
 void MainWindow::OnItemUploadCompleted()

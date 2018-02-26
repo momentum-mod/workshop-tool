@@ -5,7 +5,7 @@
 #include <QComboBox>
 #include <QTextCodec> 
 
-typedef std::pair<const char*, QString> Language;
+typedef std::pair<QString, QString> Language;
 
 class Languages
 {
