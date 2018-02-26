@@ -3,6 +3,7 @@
 #include <QFormLayout>
 #include <QTimer>
 #include <QFileDialog>
+
 #include <QtDebug>
 
 #include "steam/steam_api.h"
@@ -49,11 +50,11 @@ void MainWindow::SetupUI()
         this, &MainWindow::OnPreviewImageButtonClicked);
 
     m_lnItemTitle = new QLineEdit;
-    m_lnItemDescription = new QLineEdit;
+    m_txDescription = new QTextEdit;
     m_FileSelector = new FileSelector;
     m_ImageSelector = new ImageSelector;
     layout->addRow(tr("Map Title"), m_lnItemTitle);
-    layout->addRow(tr("Map Description"), m_lnItemDescription);
+    layout->addRow(tr("Map Description"), m_txDescription);
     layout->addRow(tr("Language"), m_languages.GetLanguageComboBox());
     layout->addRow(m_btnAddFiles, m_FileSelector);
     layout->addRow(m_btnSelectImage, m_ImageSelector);
@@ -87,14 +88,14 @@ void MainWindow::OnUploadButtonClicked()
         this, &MainWindow::OnItemUploadCompleted);
 
     m_currentItem->SetMapName(m_lnItemTitle->text());
-    m_currentItem->SetMapDescription(m_lnItemDescription->text());
+    m_currentItem->SetMapDescription(m_txDescription->toPlainText());
     m_currentItem->SetUpdateLanguage(m_languages.GetCurrentLanguage());
     m_currentItem->SetContent(m_FileSelector->GetAbsolutePathToContent());
     m_currentItem->SetPreviewImage(m_ImageSelector->GetImageAbsolutePath());
 
     //disable the UI elements so the user can't mess with stuff while we're uploading
     m_lnItemTitle->setEnabled(false);
-    m_lnItemDescription->setEnabled(false);
+    m_txDescription->setEnabled(false);
     m_languages.GetLanguageComboBox()->setEnabled(false);
     m_FileSelector->setEnabled(false);
 

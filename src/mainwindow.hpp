@@ -5,6 +5,7 @@
 #include <QStatusBar>
 #include <QLineEdit>
 #include <QProgressBar>
+#include <QTextEdit>
 
 #include <memory>
 
@@ -34,7 +35,8 @@ private:
     void SetupUI();
 
     QPushButton* m_btnUpload, *m_btnAddFiles, *m_btnSelectImage;
-    QLineEdit* m_lnItemTitle, *m_lnItemDescription;
+    QLineEdit* m_lnItemTitle;
+    QTextEdit* m_txDescription;
     QStatusBar* m_statusBar;
     QProgressBar* m_progressBar;
     Languages m_languages;

@@ -22,6 +22,8 @@ public:
 
     void AddFile(const QString& url);
     QString GetAbsolutePathToContent() const;
+public slots:
+    void DeleteSelectedFile();
 private:
     std::vector<QString> m_vFileNames;
     QFileSystemModel* m_fileSystem;

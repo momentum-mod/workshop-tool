@@ -2,6 +2,7 @@
 #include <QPainter>
 #include <QDropEvent>
 #include <QtDebug>
+#include <QShortcut>
 
 #include "fileselector.hpp"
 #include <QVBoxLayout>
@@ -9,7 +10,7 @@
 FileSelector::FileSelector(QWidget* parent)
     : QGroupBox(parent)
 {
-    setMinimumHeight(200);
+    setMinimumHeight(100);
     setAcceptDrops(true);
 
     QDir dir;
@@ -26,6 +27,11 @@ FileSelector::FileSelector(QWidget* parent)
     auto layout = new QVBoxLayout;
     layout->addWidget(m_fileSystemView);
     setLayout(layout);
+
+    //pressing DEL activates the slots only when list widget has focus
+    QShortcut* shortcut = new QShortcut(QKeySequence(Qt::Key_Delete), m_fileSystemView);
+    connect(shortcut, &QShortcut::activated, 
+        this, &FileSelector::DeleteSelectedFile);
 }
 
 FileSelector::~FileSelector()
@@ -93,5 +99,22 @@ QString FileSelector::GetAbsolutePathToContent() const
 {
     QDir dir(m_fileSystem->rootPath());
     return dir.absolutePath();
+}
+
+void FileSelector::DeleteSelectedFile()
+{
+    QModelIndex index = m_fileSystemView->currentIndex();
+    const QString selected = index.data().toString();
+
+    //theres probably a better way to do this but idk what im doing :&)
+    for(auto it = m_vFileNames.begin(); it != m_vFileNames.end(); ++it)
+    {
+        if (it->contains(selected))
+        {
+            QFile f(*it);
+            f.remove();
+            break;
+        }
+    }
 }
 
