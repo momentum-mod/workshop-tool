@@ -1,6 +1,8 @@
 #include <QMessageBox>
 #include <QtDebug>
 #include <QTimer>
+#include <QDesktopServices>
+#include <QUrl>
 
 #include <thread>
 
@@ -51,10 +53,10 @@ void WorkshopItem::UpdateUploadProgress()
 
 void WorkshopItem::AsyncUpload()
 {
-    const auto id = m_nPublishedFileId.get_future().get(); //block execution and wait for OnWorkshopItemCreated.
+    m_nPublishedFileId = m_promiseForFileID.get_future().get(); //block execution and wait for OnWorkshopItemCreated.
     //this is fine since AsyncUpload() is run in a seperate thread
 
-    m_handle = SteamUGC()->StartItemUpdate(m_nAppId, id);
+    m_handle = SteamUGC()->StartItemUpdate(m_nAppId, m_nPublishedFileId);
     SteamUGC()->SetItemTitle(m_handle, m_sMapName.toUtf8().constData());
     SteamUGC()->SetItemDescription(m_handle, m_sMapDescription.toUtf8().constData());
     SteamUGC()->SetItemUpdateLanguage(m_handle, m_pszLangugage);
@@ -87,7 +89,7 @@ void WorkshopItem::OnWorkshopItemCreated(CreateItemResult_t* result, bool bIOFai
             "SteamUGC::CreateItem failed. Error: " + result->m_eResult);
         return;
     }
-    m_nPublishedFileId.set_value(result->m_nPublishedFileId); //store published file ID for later editing
+    m_promiseForFileID.set_value(result->m_nPublishedFileId); 
     emit WorkshopItemReady();
 }
 
@@ -103,5 +105,10 @@ void WorkshopItem::OnWorkshopItemUpdated(SubmitItemUpdateResult_t* result, bool 
             "SteamUGC::SubmitItemUpdate failed. Error: " + result->m_eResult);
         return;
     }
+    if (result->m_bUserNeedsToAcceptWorkshopLegalAgreement)
+    {
+        QDesktopServices::openUrl(QUrl("https://steamcommunity.com/sharedfiles/workshoplegalagreement"));
+    }
+    QDesktopServices::openUrl(QUrl(QString("steam://url/CommunityFilePage/") + QString::number(m_nPublishedFileId)));
     emit ItemUploadCompleted();
 }

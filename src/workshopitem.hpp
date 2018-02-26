@@ -49,8 +49,8 @@ private:
     const char* m_pszLangugage;
 
     UGCUpdateHandle_t m_handle;
-    std::promise<PublishedFileId_t> m_nPublishedFileId;
-
+    std::promise<PublishedFileId_t> m_promiseForFileID;
+    PublishedFileId_t m_nPublishedFileId;
     int m_nAppId;
     uint64 m_BytesProcessed, m_BytesTotal;
     QTimer* m_uploadProcess;

@@ -30,6 +30,12 @@ void MainWindow::SetupUI()
     setWindowTitle(tr("Momentum Mod - Workshop Upload Tool"));
     setGeometry(100, 100, 400, 400);
 
+    m_statusBar = new QStatusBar;
+    m_progressBar = new QProgressBar;
+    m_statusBar->addPermanentWidget(m_progressBar);
+    setStatusBar(m_statusBar);
+    m_statusBar->showMessage(tr("Ready."));
+
     auto layout = new QFormLayout;
     m_btnUpload = new QPushButton(tr("Upload"));
     m_btnAddFiles = new QPushButton(tr("Add files"));
@@ -49,14 +55,19 @@ void MainWindow::SetupUI()
 
     layout->addWidget(m_btnUpload);
 
+    auto terms = new QLabel;
+    terms->setText("<a>By submitting this item, you agree to the</a> \
+        <a href=\"https://steamcommunity.com/sharedfiles/workshoplegalagreement\"> workshop terms of service.</a>");
+    terms->setTextFormat(Qt::RichText);
+    terms->setTextInteractionFlags(Qt::TextBrowserInteraction);
+    terms->setOpenExternalLinks(true);
+
+    //add a spacer to force the terms to the bottom
+    layout->addItem(new QSpacerItem(0, 1000, QSizePolicy::Expanding, QSizePolicy::Expanding));
+    layout->addRow(terms);
+
     auto frame = new QFrame;
     frame->setLayout(layout);
-
-    m_statusBar = new QStatusBar;
-    m_progressBar = new QProgressBar;
-    m_statusBar->addPermanentWidget(m_progressBar);
-    setStatusBar(m_statusBar);
-    m_statusBar->showMessage(tr("Ready."));
     setCentralWidget(frame);
 }
 void MainWindow::OnUploadButtonClicked()
