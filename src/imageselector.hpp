@@ -22,6 +22,8 @@ public:
 
     void OpenImage(const QString& url);
     QString GetImageAbsolutePath() const;
+public slots:
+    void CreateImageDialog();
 private:
     QString m_sFileName;
     QImage m_image;

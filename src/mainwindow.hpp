@@ -24,8 +24,6 @@ public:
 
  private slots:
     void OnUploadButtonClicked();
-    void OnAddFilesButtonClicked();
-    void OnPreviewImageButtonClicked();
 
     void OnItemReady();
     void OnItemUploadBegan();

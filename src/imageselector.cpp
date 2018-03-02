@@ -9,6 +9,7 @@
 #include <QtDebug>
 
 #include "imageselector.hpp"
+#include <QFileDialog>
 
 
 ImageSelector::ImageSelector(QWidget* parent)
@@ -73,8 +74,7 @@ void ImageSelector::OpenImage(const QString& url)
     {
         QMessageBox::warning(this, 
             "Cannot load image",
-            tr("Cannot load %1: %2")
-            .arg(QDir::toNativeSeparators(url), reader.errorString()));
+            tr("Cannot load %1: %2").arg(QDir::toNativeSeparators(url), reader.errorString()));
         return;
     }
     m_sFileName = url;
@@ -86,5 +86,24 @@ QString ImageSelector::GetImageAbsolutePath() const
 {
     QDir dir(m_sFileName);
     return dir.absolutePath();
+}
+
+void ImageSelector::CreateImageDialog()
+{
+    QFileDialog dialog(this);
+    dialog.setFileMode(QFileDialog::AnyFile);
+    dialog.setViewMode(QFileDialog::Detail);
+    dialog.setNameFilter(tr("Images (*.png *.gif *.jpg *.jpeg)"));
+
+    QStringList fileNames;
+    if (dialog.exec())
+    {
+        fileNames = dialog.selectedFiles();
+    }
+    for (const auto& file : fileNames)
+    {
+        OpenImage(file);
+    }
+
 }
 

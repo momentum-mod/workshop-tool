@@ -39,29 +39,33 @@ void MainWindow::SetupUI()
 
     auto layout = new QFormLayout;
     m_btnUpload = new QPushButton(tr("Upload"));
+    m_btnUpload->setMinimumHeight(50);
     m_btnAddFiles = new QPushButton(tr("Add files"));
     m_btnSelectImage = new QPushButton(tr("Select Preview Image"));
-
-    connect(m_btnUpload, &QPushButton::clicked,
-        this, &MainWindow::OnUploadButtonClicked);
-    connect(m_btnAddFiles, &QPushButton::clicked,
-        this, &MainWindow::OnAddFilesButtonClicked);
-    connect(m_btnSelectImage, &QPushButton::clicked,
-        this, &MainWindow::OnPreviewImageButtonClicked);
 
     m_lnItemTitle = new QLineEdit;
     m_txDescription = new QTextEdit;
     m_FileSelector = new FileSelector;
     m_ImageSelector = new ImageSelector;
+
+    connect(m_btnUpload, &QPushButton::clicked,
+        this, &MainWindow::OnUploadButtonClicked);
+    connect(m_btnAddFiles, &QPushButton::clicked,
+        m_FileSelector, &FileSelector::CreateFileDialog);
+    connect(m_btnSelectImage, &QPushButton::clicked,
+        m_ImageSelector, &ImageSelector::CreateImageDialog);
+
     layout->addRow(tr("Map Title"), m_lnItemTitle);
     layout->addRow(tr("Map Description"), m_txDescription);
     layout->addRow(tr("Language"), m_languages.GetLanguageComboBox());
-    layout->addRow(m_btnAddFiles, m_FileSelector);
-    layout->addRow(m_btnSelectImage, m_ImageSelector);
-    layout->addWidget(m_btnUpload);
+    layout->addRow(m_btnAddFiles);
+    layout->addRow(m_FileSelector);
+    layout->addRow(m_btnSelectImage);
+    layout->addRow(m_ImageSelector);
+    //layout->addWidget(m_btnUpload);
 
     auto terms = new QLabel;
-    terms->setText("<a>By submitting this item, you agree to the</a> \
+    terms->setText("<a>By submitting this item,</a><br> <a>you agree to the</a><br> \
         <a href=\"https://steamcommunity.com/sharedfiles/workshoplegalagreement\"> workshop terms of service.</a>");
     terms->setTextFormat(Qt::RichText);
     terms->setTextInteractionFlags(Qt::TextBrowserInteraction);
@@ -69,7 +73,7 @@ void MainWindow::SetupUI()
 
     //add a spacer to force the terms to the bottom
     layout->addItem(new QSpacerItem(0, 1000, QSizePolicy::Expanding, QSizePolicy::Expanding));
-    layout->addRow(terms);
+    layout->addRow(terms, m_btnUpload);
 
     auto frame = new QFrame;
     frame->setLayout(layout);
@@ -101,41 +105,6 @@ void MainWindow::OnUploadButtonClicked()
 
     m_currentItem->BeginUpload();
 }
-
-void MainWindow::OnAddFilesButtonClicked()
-{
-    QFileDialog dialog(this);
-    dialog.setFileMode(QFileDialog::ExistingFiles);
-    dialog.setViewMode(QFileDialog::Detail);
-    QStringList fileNames;
-    if (dialog.exec())
-    {
-        fileNames = dialog.selectedFiles();
-    }
-    for (const auto& file : fileNames)
-    {
-        m_FileSelector->AddFile(file);
-    }
-}
-
-void MainWindow::OnPreviewImageButtonClicked()
-{
-    QFileDialog dialog(this);
-    dialog.setFileMode(QFileDialog::AnyFile);
-    dialog.setViewMode(QFileDialog::Detail);
-    dialog.setNameFilter(tr("Images (*.png *.gif *.jpg *.jpeg)"));
-
-    QStringList fileNames;
-    if (dialog.exec())
-    {
-        fileNames = dialog.selectedFiles();
-    }
-    for (const auto& file : fileNames)
-    {
-        m_ImageSelector->OpenImage(file);
-    }
-}
-
 void MainWindow::OnItemReady()
 {
     m_statusBar->showMessage(tr("Workshop Item Ready!"));

@@ -21,9 +21,12 @@ public:
     void dropEvent(QDropEvent* event) override;
 
     void AddFile(const QString& url);
+    bool ProcessBSP(QFile& file);
+
     QString GetAbsolutePathToContent() const;
 public slots:
     void DeleteSelectedFile();
+    void CreateFileDialog();
 private:
     std::vector<QString> m_vFileNames;
     QFileSystemModel* m_fileSystem;
