@@ -96,7 +96,7 @@ void MainWindow::OnUploadButtonClicked()
     m_currentItem->SetUpdateLanguage(m_languages.GetCurrentLanguage());
     m_currentItem->SetContent(m_FileSelector->GetAbsolutePathToContent());
     m_currentItem->SetPreviewImage(m_ImageSelector->GetImageAbsolutePath());
-
+    m_currentItem->SetTags();
     //disable the UI elements so the user can't mess with stuff while we're uploading
     m_lnItemTitle->setEnabled(false);
     m_txDescription->setEnabled(false);

@@ -1,0 +1,46 @@
+#pragma once
+
+#include "steam/steam_api.h"
+
+class QString;
+
+class WorkshopItemTagArray
+{
+public:
+    WorkshopItemTagArray()
+    {
+        //allocate data for strings
+        m_data.m_ppStrings = new const char*[NUM_TAGS];
+        for (int i = 0; i < NUM_TAGS; ++i)
+        {
+            m_data.m_ppStrings[i] = new const char[TAG_LENGTH];
+        }
+        m_data.m_nNumStrings = 0;
+    }
+    ~WorkshopItemTagArray()
+    {
+        for (int i = 0; i < NUM_TAGS; ++i) {
+            delete[] m_data.m_ppStrings[i];
+        }
+        delete[] m_data.m_ppStrings;
+    }
+
+    void AddNewTag(const QString& tag);
+    int32 GetNumTags() const { return m_data.m_nNumStrings; }
+    SteamParamStringArray_t* GetTags() { return &m_data; }
+private:
+    SteamParamStringArray_t m_data;
+
+    static const int NUM_TAGS = 20;
+    static const int TAG_LENGTH = 255;
+
+};
+
+inline void WorkshopItemTagArray::AddNewTag(const QString& tag)
+{
+    const int idx = m_data.m_nNumStrings;
+    const char* data = tag.toUtf8().constData();
+
+    strcpy_s(const_cast<char* const>(m_data.m_ppStrings[idx]), TAG_LENGTH, data);
+    m_data.m_nNumStrings++;
+}

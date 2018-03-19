@@ -4,8 +4,9 @@
 
 #include "steam/steam_api.h"
 #include "language.hpp"
-
+#include "tags.hpp"
 #include <future>
+
 static const int MOMENTUM_APPID = 669270;
 
 class WorkshopItem : public QObject
@@ -20,16 +21,15 @@ public:
     void SetUpdateLanguage(Language lang);
     void SetContent(const QString& path); //the actual map file(s)
     void SetPreviewImage(const QString& path);
-    /*
-    void SetMapPreviewImage(...);
-    */
+    void SetTags();
+
 signals:
     void WorkshopItemReady();
     void ItemUploadBegan();
     void ItemUploadStatus(uint64 pBytesProcessed, uint64 pBytesTotal);
     void ItemUploadCompleted();
 
-    private slots:
+private slots:
     void UpdateUploadProgress();
     void OnUploadBegan();
 
@@ -54,5 +54,6 @@ private:
     int m_nAppId;
     uint64 m_BytesProcessed, m_BytesTotal;
     QTimer* m_uploadProcess;
+    WorkshopItemTagArray m_Tags;
 };
 

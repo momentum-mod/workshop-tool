@@ -11,6 +11,7 @@
 WorkshopItem::WorkshopItem(int appID)
     : m_nAppId(appID)
 {
+
     const auto call = SteamUGC()->CreateItem(appID, k_EWorkshopFileTypeCommunity);
     m_ItemCreatedCallback.Set(call, this, &WorkshopItem::OnWorkshopItemCreated);
 
@@ -23,31 +24,6 @@ void WorkshopItem::BeginUpload()
     //spawn a new thread so that our upload process does not block the CCallResult
     std::thread upload(&WorkshopItem::AsyncUpload, this); 
     upload.detach();
-}
-
-void WorkshopItem::SetMapName(const QString& name)
-{
-    m_sMapName = name;
-}
-
-void WorkshopItem::SetMapDescription(const QString& text)
-{
-    m_sMapDescription = text;
-}
-
-void WorkshopItem::SetUpdateLanguage(Language lang)
-{
-    m_sLangugage = lang.first;
-}
-
-void WorkshopItem::SetContent(const QString& path)
-{
-    m_sContentFolder = path;
-}
-
-void WorkshopItem::SetPreviewImage(const QString& path)
-{
-    m_sPreviewImageFilePath = path;
 }
 
 void WorkshopItem::UpdateUploadProgress()
@@ -67,7 +43,7 @@ void WorkshopItem::AsyncUpload()
     SteamUGC()->SetItemUpdateLanguage(m_handle, m_sLangugage.toUtf8().constData());
     SteamUGC()->SetItemContent(m_handle, m_sContentFolder.toUtf8().constData());
     SteamUGC()->SetItemPreview(m_handle, m_sPreviewImageFilePath.toUtf8().constData());
-
+    SteamUGC()->SetItemTags(m_handle, m_Tags.GetTags());
     const auto call = SteamUGC()->SubmitItemUpdate(m_handle, "");
     m_ItemUpdateCallback.Set(call, this, &WorkshopItem::OnWorkshopItemUpdated);
     emit ItemUploadBegan();
@@ -117,4 +93,39 @@ void WorkshopItem::OnWorkshopItemUpdated(SubmitItemUpdateResult_t* result, bool 
     }
     QDesktopServices::openUrl(QUrl(QString("steam://url/CommunityFilePage/") + QString::number(m_nPublishedFileId)));
     emit ItemUploadCompleted();
+}
+
+void WorkshopItem::SetMapName(const QString& name)
+{
+    m_sMapName = name;
+}
+
+void WorkshopItem::SetMapDescription(const QString& text)
+{
+    m_sMapDescription = text;
+}
+
+void WorkshopItem::SetUpdateLanguage(Language lang)
+{
+    m_sLangugage = lang.first;
+}
+
+void WorkshopItem::SetContent(const QString& path)
+{
+    m_sContentFolder = path;
+}
+
+void WorkshopItem::SetPreviewImage(const QString& path)
+{
+    m_sPreviewImageFilePath = path;
+}
+
+void WorkshopItem::SetTags()
+{
+    //set uploader's steam ID
+
+    const QString sid = QString::number(SteamUser()->GetSteamID().ConvertToUint64());
+    m_Tags.AddNewTag(sid);
+    //set gamemode
+
 }
