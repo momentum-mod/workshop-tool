@@ -28,6 +28,8 @@ MainWindow::MainWindow(QWidget *parent)
 }
 void MainWindow::SetupUI()
 {
+    setWindowIcon(QIcon(":images/logo.png"));
+
     setWindowTitle(tr("Momentum Mod - Workshop Upload Tool"));
     setGeometry(100, 100, 0, 0);
 

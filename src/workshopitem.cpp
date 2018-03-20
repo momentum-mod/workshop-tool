@@ -66,9 +66,9 @@ void WorkshopItem::OnWorkshopItemCreated(CreateItemResult_t* result, bool bIOFai
     if (result->m_eResult != k_EResultOK)
     {
         QMessageBox fatalError;
-        fatalError.critical(nullptr, 
-            "CreateItem ERROR!", 
-            "SteamUGC::CreateItem failed. Error: " + result->m_eResult);
+        fatalError.critical(nullptr,
+            "CreateItem ERROR!",
+            QString("SteamUGC::CreateItem failed. Error: ") + QString::number(result->m_eResult));
         return;
     }
     m_promiseForFileID.set_value(result->m_nPublishedFileId); 
@@ -84,7 +84,8 @@ void WorkshopItem::OnWorkshopItemUpdated(SubmitItemUpdateResult_t* result, bool 
         QMessageBox fatalError;
         fatalError.critical(nullptr,
             "SubmitItemUpdate ERROR!",
-            "SteamUGC::SubmitItemUpdate failed. Error: " + result->m_eResult);
+            QString("SteamUGC::SubmitItemUpdate failed. Error: ") + QString::number(result->m_eResult));
+
         return;
     }
     if (result->m_bUserNeedsToAcceptWorkshopLegalAgreement)
