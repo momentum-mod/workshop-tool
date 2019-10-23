@@ -6,6 +6,9 @@ steamworks/*/
 # except for readme
 !*/steamworks/readme.txt
 
+# Ignore CMake Build folder
+*build/*
+
 # Prerequisites
 *.d
 
