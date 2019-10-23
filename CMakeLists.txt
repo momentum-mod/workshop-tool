@@ -22,6 +22,8 @@ if (APPLE)
 	set(GUI_TYPE MACOSX_BUNDLE)
 endif (APPLE)
 
+set(THREADS_PREFER_PTHREAD_FLAG ON)
+find_package(Threads REQUIRED)
 
 #find Qt libraries
 find_package(Qt5Widgets)
@@ -36,7 +38,7 @@ find_package(STEAMWORKS REQUIRED)
 include_directories(${STEAMWORKS_INCLUDE_DIR})
 
 set (PROJECT_SRCS 
-		src/main.cpp
+	src/main.cpp
         src/mainwindow.hpp src/mainwindow.cpp
         src/workshopitem.hpp src/workshopitem.cpp
         src/language.hpp
@@ -49,4 +51,5 @@ target_link_libraries(momentum-workshop-tool
 		Qt5::Widgets
 		Qt5::Core 
 		Qt5::Gui 
+		Threads::Threads
 		${STEAMWORKS_LIBRARY})

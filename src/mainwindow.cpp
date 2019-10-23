@@ -6,7 +6,7 @@
 
 #include <QtDebug>
 
-#include "steam/steam_api.h"
+#include "steam_api.h"
 
 #include "mainwindow.hpp"
 
