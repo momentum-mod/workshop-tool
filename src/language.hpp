@@ -62,7 +62,7 @@ public:
     {
         return m_languages[m_cbLanguages->currentIndex()];
     }
-    QComboBox* Languages::GetLanguageComboBox() const
+    QComboBox* GetLanguageComboBox() const
     {
         return m_cbLanguages;
     }

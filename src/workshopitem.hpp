@@ -2,7 +2,7 @@
 
 #include <QString>
 
-#include "steam/steam_api.h"
+#include "steam_api.h"
 #include "language.hpp"
 #include "tags.hpp"
 #include <future>

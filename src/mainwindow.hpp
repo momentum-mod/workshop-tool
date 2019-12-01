@@ -42,5 +42,4 @@ private:
     FileSelector* m_FileSelector;
     ImageSelector* m_ImageSelector;
     std::unique_ptr<WorkshopItem> m_currentItem; //only support one item at this time
-
 };
